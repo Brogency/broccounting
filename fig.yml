@@ -1,0 +1,7 @@
+web:
+    build: .
+    command: lein run
+    volumes: 
+        - .:/usr/src/app
+
+
