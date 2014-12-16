@@ -32,12 +32,25 @@
       (if (= (:body connect-result) "<login>ok</login>")
         (let [JSESSIONID (:value (get (:cookies connect-result) "JSESSIONID"))
               session (assoc session :jsessionid JSESSIONID)]
-          (-> (redirect "/tasks")
+          (-> (redirect "/projects")
               (assoc :session session)))
         (layout/error (:body connect-result)))))
 
+(defn projects [session]
+  (let [id (:jsessionid session)]
+    (if id
+      (layout/common 
+        [:h2 "Projects:"]
+        [:div (str
+                (client/get "http://bro.myjetbrains.com/youtrack/rest/admin/project"
+                           {:cookies {"JSESSIONID" {:value (:jsessionid session)}}}))])
+      (redirect "/tasks"))))
+
+ 
 (defroutes home-routes
   (GET "/" request (home request))
   (GET "/tasks" [:as {session :session}] (tasks session))
   (POST "/tasks" [login password :as {session :session}]
-        (tasks-login login password session)))
+        (tasks-login login password session))
+  (GET "/projects" [:as {session :session}] (projects session)))
+
