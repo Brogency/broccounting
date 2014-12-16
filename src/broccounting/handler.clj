@@ -1,6 +1,5 @@
 (ns broccounting.handler
   (:require [compojure.core :refer [defroutes routes]]
-
             [ring.middleware.resource :refer [wrap-resource]]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
