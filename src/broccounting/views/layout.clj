@@ -7,3 +7,6 @@
      [:title "Welcome to broccounting"]
      (include-css "/css/screen.css")]
     [:body body]))
+
+(defn error [& body]
+  (common [:div {:class "error"} body]))

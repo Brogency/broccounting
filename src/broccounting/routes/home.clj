@@ -1,6 +1,6 @@
 (ns broccounting.routes.home
   (:require [compojure.core :refer :all]
-            [ring.util.response :refer [response]]
+            [ring.util.response :refer [redirect]]
             [broccounting.views.layout :as layout]
             [clj-http.client :as client]))
 
@@ -30,11 +30,11 @@
                                      :form-params {:login login
                                                    :password password}})]
       (if (= (:body connect-result) "<login>ok</login>")
-        (let [JSESSIONID (:value (get (:cookies connect-result) "JSESSIONID"))]
-          (assoc session :jsessionid JSESSIONID)
-          (-> (response JSESSIONID)
+        (let [JSESSIONID (:value (get (:cookies connect-result) "JSESSIONID"))
+              session (assoc session :jsessionid JSESSIONID)]
+          (-> (redirect "/tasks")
               (assoc :session session)))
-        (layout/common (:body connect-result)))))
+        (layout/error (:body connect-result)))))
 
 (defroutes home-routes
   (GET "/" request (home request))
