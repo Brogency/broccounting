@@ -2,6 +2,7 @@
   (:require [compojure.core :refer :all]
             [ring.util.response :refer [redirect]]
             [broccounting.views.layout :as layout]
+            [clojure.xml :as xml]
             [clj-http.client :as client]))
 
 (defn home [request]
@@ -39,11 +40,14 @@
 (defn projects [session]
   (let [id (:jsessionid session)]
     (if id
-      (layout/common 
-        [:h2 "Projects:"]
-        [:div (str
-                (client/get "http://bro.myjetbrains.com/youtrack/rest/admin/project"
-                           {:cookies {"JSESSIONID" {:value (:jsessionid session)}}}))])
+      (let [response (client/get "http://bro.myjetbrains.com/youtrack/rest/admin/project"
+                           {:response-interceptor (fn [resp ctx] (println resp))
+                            :cookies {"JSESSIONID" {:value (:jsessionid session)}}})
+            xml-data (:body response)
+            stream (java.io.ByteArrayInputStream. (.getBytes (.trim xml-data)))]
+        (layout/common [:h2 "Projects:"]
+;                       [:div (str (doall (map (fn [tag] (:attrs tag)) (:content (xml/parse stream)))))]))
+                       [:div (map (fn [t] [:p (:id (:attrs t))]) (:content (xml/parse stream)))]))
       (redirect "/tasks"))))
 
  
@@ -53,4 +57,3 @@
   (POST "/tasks" [login password :as {session :session}]
         (tasks-login login password session))
   (GET "/projects" [:as {session :session}] (projects session)))
-
