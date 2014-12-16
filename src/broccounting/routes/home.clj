@@ -46,7 +46,6 @@
             xml-data (:body response)
             stream (java.io.ByteArrayInputStream. (.getBytes (.trim xml-data)))]
         (layout/common [:h2 "Projects:"]
-;                       [:div (str (doall (map (fn [tag] (:attrs tag)) (:content (xml/parse stream)))))]))
                        [:div (map (fn [t] [:p (:id (:attrs t))]) (:content (xml/parse stream)))]))
       (redirect "/tasks"))))
 
