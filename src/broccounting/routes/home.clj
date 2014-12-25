@@ -37,18 +37,6 @@
               (assoc :session session)))
           (layout/error (str content )))))
 
-
-      ;(let [body (:body connect-result
-
-
-      ;(if (= (:body connect-result) "ok")
-        ;(let [JSESSIONID (:value (get (:cookies connect-result) "JSESSIONID"))
-              ;session (assoc session :jsessionid JSESSIONID)]
-          ;(-> (redirect "/projects")
-              ;(assoc :session session)))
-        ;(let [{[error-text] :content} (:body connect-result)]
-          ;(layout/error error-text)))))
-
 (defroutes home-routes
   (GET "/" request (home request))
   (GET "/login" [:as {session :session}] (login session))
