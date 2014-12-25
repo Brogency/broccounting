@@ -13,19 +13,16 @@
       [:br ]
       [:a {:href "/tasks"} "login"]]))
 
-(defn tasks [session]
-  (let [id (:jsessionid session)]
-    (if id
-      (layout/common [:h3 (str "Hello " id)])
+(defn login [session]
       (layout/common 
           [:div
             [:h3 "Result"]
             [:form {:method "POST"}
              [:input {:name "login"}]
              [:input {:name "password" :type "password"}]
-             [:input {:type "submit"}]]]))))
+             [:input {:type "submit"}]]]))
 
-(defn tasks-login [login password session]
+(defn login-do-login [login password session]
   (let [connect-result (client/post "http://bro.myjetbrains.com/youtrack/rest/user/login"
                                     {:throw-exceptions false
                                      :form-params {:login login
@@ -37,24 +34,45 @@
               (assoc :session session)))
         (layout/error (:body connect-result)))))
 
+(defn youtrack-query [path session & [opts]]
+  (client/get (str "http://bro.myjetbrains.com/youtrack/rest/" path)
+              (merge 
+                {:cookies {"JSESSIONID" {:value (:jsessionid session)}}}
+                opts)))
+
+
 (defn projects [session]
-  (let [id (:jsessionid session)]
-    (if id
-      (let [response (client/get "http://bro.myjetbrains.com/youtrack/rest/admin/project"
-                           {:response-interceptor (fn [resp ctx] (println resp))
-                            :cookies {"JSESSIONID" {:value (:jsessionid session)}}})
-            xml-data (:body response)
-            stream (java.io.ByteArrayInputStream. (.getBytes (.trim xml-data)))]
-        (layout/common [:h2 "Projects:"]
-                       [:div (map (fn [t] [:p (:id (:attrs t))]) (:content (xml/parse stream)))]))
-      (redirect "/tasks"))))
+  (let [response (youtrack-query "admin/project" session)
+        xml-data (:body response)
+        stream (java.io.ByteArrayInputStream. (.getBytes (.trim xml-data)))]
+    (layout/common [:h2 "Projects:"]
+                   [:div (map (fn [t] [:p (:id (:attrs t))]) (:content (xml/parse stream)))])))
 
  
 (defroutes home-routes
   (GET "/" request (home request))
-  (GET "/tasks" [:as {session :session}] (tasks session))
-  (POST "/tasks" [login password :as {session :session}]
-        (tasks-login login password session)))
+  (GET "/login" [:as {session :session}] (login session))
+  (POST "/login" [login password :as {session :session}]
+        (login-do-login login password session)))
 
-(defroutes project-home-routes
+(defmacro def-private-routes [name guard & routes]
+  `(defroutes ~name 
+     ~@(for [route routes
+             :let [[method path destruct call] route]]
+         `(~method ~path [request#] 
+                   (fn [request#] 
+                     (if (~guard request#)
+                       (let [~destruct request#] ~call)
+                       (redirect "/login")))))))
+
+
+(defn guard [request]
+  (let [[:as {session :session}] request
+        response (youtrack-query 
+                   "admin/user/root" 
+                   session 
+                   {:throw-exceptions false})]
+    (= (:status response) 200)))
+
+(def-private-routes project-home-routes guard
   (GET "/projects" [:as {session :session}] (projects session)))
