@@ -7,7 +7,7 @@
             [hiccup.middleware :refer [wrap-base-url]]
             [compojure.handler :as handler]
             [compojure.route :as route]
-            [broccounting.routes.home :refer [home-routes]]))
+            [broccounting.routes.home :refer [home-routes project-home-routes]]))
 
 (defn init []
   (println "broccounting is starting"))
@@ -20,7 +20,8 @@
   (route/not-found "Not Found"))
 
 (def app
-  (-> (routes home-routes app-routes)
+  (-> (routes home-routes project-home-routes app-routes)
+      (wrap-session 
+          {:store (cookie-store {:key "1234567890123456"})})
       (handler/site)
-      (wrap-session {:store (cookie-store)})
       (wrap-base-url)))

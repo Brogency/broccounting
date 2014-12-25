@@ -54,5 +54,7 @@
   (GET "/" request (home request))
   (GET "/tasks" [:as {session :session}] (tasks session))
   (POST "/tasks" [login password :as {session :session}]
-        (tasks-login login password session))
+        (tasks-login login password session)))
+
+(defroutes project-home-routes
   (GET "/projects" [:as {session :session}] (projects session)))
