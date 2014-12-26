@@ -8,7 +8,6 @@
   (layout/common 
     [:div
       [:h1 "Hello World!"]
-      (str request)
       [:br ]
       [:a {:href "/login"} "login"]]))
 

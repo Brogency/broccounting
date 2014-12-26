@@ -5,7 +5,8 @@
                  [compojure "1.1.6"]
                  [hiccup "1.0.5"]
                  [ring-server "0.3.1"]]
-  :plugins [[lein-ring "0.8.12"]]
+  :plugins [[lein-ring "0.8.12"]
+            [lein-cloverage "1.0.2"]]
   :ring {:handler broccounting.handler/app
          :init broccounting.handler/init
          :destroy broccounting.handler/destroy}

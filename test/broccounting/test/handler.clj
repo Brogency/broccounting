@@ -3,11 +3,11 @@
         ring.mock.request
         broccounting.handler))
 
-(deftest test-app
+(deftest test-home
   (testing "main route"
     (let [response (app (request :get "/"))]
       (is (= (:status response) 200))
-      (is (= (:body response) "Hello World"))))
+      (is (re-find #"login" (:body response)))))
 
   (testing "not-found route"
     (let [response (app (request :get "/invalid"))]
