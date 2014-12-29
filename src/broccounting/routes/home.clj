@@ -34,7 +34,7 @@
               session (assoc session :jsessionid jsessionid)]
           (-> (redirect "/projects")
               (assoc :session session)))
-          (layout/error (str content )))))
+        (layout/error (str content)))))
 
 (defroutes home-routes
   (GET "/" request (home request))
