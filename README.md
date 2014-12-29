@@ -1,4 +1,4 @@
-## Broccounting  ![Build status: Error](https://travis-ci.org/Brogency/broccounting.svg)
+## Broccounting  [![Build status: Error](https://travis-ci.org/Brogency/broccounting.svg)](https://travis-ci.org/Brogency/broccounting)
 
 
 It's accounting system for bro.agency  
