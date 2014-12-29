@@ -1,8 +1,7 @@
-## Broccounting  
+## Broccounting  |Build Status|
 
 It's accounting system for bro.agency  
-It's integrated with kontur and youtrack
-It's only draft now
+It's integrated with kontur and youtrack  
 
 ## Prerequisites
 
@@ -22,3 +21,4 @@ To run tests:
 ## License
 
 Copyright © 2014 FIXME
+.. |Build Status| image:: https://travis-ci.org/Brogency/broccounting.svg
