@@ -1,4 +1,5 @@
-## Broccounting  |Build Status|
+## Broccounting  ![Build status: Error](https://travis-ci.org/Brogency/broccounting.svg)
+
 
 It's accounting system for bro.agency  
 It's integrated with kontur and youtrack  
@@ -21,4 +22,3 @@ To run tests:
 ## License
 
 Copyright © 2014 FIXME
-.. |Build Status| image:: https://travis-ci.org/Brogency/broccounting.svg
