@@ -1,8 +1,8 @@
-##Broccounting  
+## Broccounting  
 
-It's accounting sisten for bro.agency  
-It's integated with kontur and youtrack  
-See some documentation in docs/  
+It's accounting system for bro.agency  
+It's integrated with kontur and youtrack
+It's only draft now
 
 ## Prerequisites
 
@@ -15,7 +15,10 @@ You will need [Leiningen][1] 1.7.0 or above installed.
 To start a web server for the application, run:
 
     lein ring server
+## Test
+To run tests:
 
+    lein cloverage
 ## License
 
 Copyright © 2014 FIXME

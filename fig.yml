@@ -1,6 +1,8 @@
 web:
     build: .
-    command: lein run
+    command: lein ring server
+    ports:
+        "3000":"3000"
     volumes: 
         - .:/usr/src/app
 
