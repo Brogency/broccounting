@@ -1,8 +1,14 @@
 (ns broccounting.utils
   (:require [compojure.core :refer [defroutes routes]]
             [clojure.xml :as xml]
+            [clojure.data.csv :as csv]
             [ring.util.response :refer [redirect]]
             [clj-http.client :as client]))
+
+(defn- parse-xml [xml-data]
+  (let [stream (java.io.ByteArrayInputStream. (.getBytes (.trim xml-data)))
+        body (xml/parse stream)]
+    body))
 
 (defn- youtrack-query [method path session & [opts]]
   (let [jsessionid (:jsessionid session)
@@ -15,9 +21,13 @@
                      {:cookies cookies 
                       :throw-exceptions false}
                      opts))
-        xml-data (:body response)
-        stream (java.io.ByteArrayInputStream. (.getBytes (.trim xml-data)))
-        body (xml/parse stream)]
+        responce-body (:body response)
+        content-type ((:headers response) "Content-Type")
+        parser ({"text/csv; charset=utf-8" csv/read-csv
+                 "application/xml; charset=UTF-8" parse-xml}
+                content-type
+                identity)
+        body (parser responce-body)]
   (assoc response :body body))) 
 
 (defn youtrack-post [path session & [opts]]

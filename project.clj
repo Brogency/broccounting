@@ -4,7 +4,9 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [compojure "1.1.6"]
                  [hiccup "1.0.5"]
-                 [ring-server "0.3.1"]]
+                 [ring-server "0.3.1"]
+                 [clj-time "0.9.0"]
+                 [org.clojure/data.csv "0.1.2"]]
   :plugins [[lein-ring "0.8.12"]
             [lein-cloverage "1.0.2"]]
   :ring {:handler broccounting.handler/app
