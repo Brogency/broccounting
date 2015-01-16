@@ -59,6 +59,18 @@
          (is (= (:status response) 200))
          (is (re-find #"Projects:" body)))))
 
+  (testing "projects page content"
+    (with-redefs-fn {#'broccounting.utils/youtrack-get
+                     (fn [path session & [opts]]
+                         {:status 200 
+                          :body {:content [{:attrs {:id "PROJECT1"}}
+                                           {:attrs {:id "PROJECT2"}}
+                                           ]}})}
+      #(let [response (app (request :get "/projects"))
+             body (:body response)]
+         (is (= (:status response) 200))
+         (is (re-find #"Projects:" body)))))
+
   (testing "not-found route"
     (let [response (app (request :get "/invalid"))]
       (is (= (:status response) 404)))))

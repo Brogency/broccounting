@@ -35,7 +35,36 @@
                   :body {:tag :data, :attrs nil, :content ["ok"]}}))
           (is (= (youtrack-post "foo" {:jsessionid {:value "JSESSIONID"}}) 
                  {:headers {"Content-Type" "application/xml; charset=UTF-8"}
-                  :body {:tag :data, :attrs nil, :content ["ok"]}}))))))
+                  :body {:tag :data, :attrs nil, :content ["ok"]}})))))
+  (with-redefs-fn {#'clj-http.client/get (fn [path opts]
+                                           {:headers {"Content-Type" "text/csv; charset=UTF-8"}
+                                            :body "foo,bar\none,two"})
+                   #'clj-http.client/post (fn [path opts]
+                                            {:headers {"Content-Type" "text/csv; charset=UTF-8"}
+                                            :body "foo,bar\none,two"})}
+    #(do
+        (testing "Simple youtrack-get"
+          (is (=(youtrack-get "foo" {}) 
+                {:headers {"Content-Type" "text/csv; charset=UTF-8"}
+                 :body [["foo" "bar"]["one" "two"]]})))
+        (testing "Session youtrack-get"
+          (is (= (youtrack-get "foo" {:foo :bar}) 
+                 {:headers {"Content-Type" "text/csv; charset=UTF-8"}
+                  :body [["foo" "bar"]["one" "two"]]}))
+          (is (= (youtrack-get "foo" {:jsessionid {:value "JSESSIONID"}}) 
+                 {:headers {"Content-Type" "text/csv; charset=UTF-8"}
+                  :body [["foo" "bar"]["one" "two"]]})))
+        (testing "Simple youtrack-post"
+          (is (= (youtrack-post "foo" {}) 
+                 {:headers {"Content-Type" "text/csv; charset=UTF-8"}
+                  :body [["foo" "bar"]["one" "two"]]})))
+        (testing "Session youtrack-post"
+          (is (= (youtrack-post "foo" {:foo :bar}) 
+                 {:headers {"Content-Type" "text/csv; charset=UTF-8"}
+                  :body [["foo" "bar"]["one" "two"]]}))
+          (is (= (youtrack-post "foo" {:jsessionid {:value "JSESSIONID"}}) 
+                 {:headers {"Content-Type" "text/csv; charset=UTF-8"}
+                  :body [["foo" "bar"]["one" "two"]]}))))))
 
 (deftest private-routes 
   (defn guard [_] "whatever")

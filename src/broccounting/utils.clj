@@ -22,9 +22,11 @@
                       :throw-exceptions false}
                      opts))
         responce-body (:body response)
-        content-type ((:headers response) "Content-Type")
-        parser ({"text/csv; charset=utf-8" csv/read-csv
-                 "application/xml; charset=UTF-8" parse-xml}
+        content-type-header ((:headers response) "Content-Type")
+        content-type (get (clojure.string/split content-type-header #";") 0)
+
+        parser ({"text/csv" csv/read-csv
+                 "application/xml" parse-xml}
                 content-type
                 identity)
         body (parser responce-body)]
