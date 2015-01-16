@@ -31,11 +31,6 @@
                    [:p "Report period"]
                    [:p "From " start-period " To " stop-period]
                    [:div (str group-report)])))
-                   ;[:table
-                    ;(for [row report]
-                      ;[:tr
-                       ;(for [item row]
-                         ;[:td item])])])))
 
 (defn guard [request]
   (let [[:as {session :session}] request

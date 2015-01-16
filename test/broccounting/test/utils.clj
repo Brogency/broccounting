@@ -84,3 +84,76 @@
             headers(:headers response)]
         (is (= (:status response) 302))
         (is (= (get headers "Location")"/login"))))))
+
+(deftest reports
+  (def csv-data
+       (shuffle [["TASK-1" "Task1 description" "10" "root"]
+                 ["TASK-1" "Task1 description" "20" "toor"]
+                 ["TASK-1" "Task1 description" "30" "user"]
+                 ["TASK-2" "Task2 description" "10" "root"]
+                 ["TASK-2" "Task2 description" "20" "toor"]
+                 ["TASK-2" "Task2 description" "30" "user"]
+                 ["TASK-3" "Task3 description" "10" "root"]
+                 ["TASK-3" "Task3 description" "20" "toor"]
+                 ["TASK-3" "Task3 description" "30" "user"]
+
+                 ["TASK-1" "Task1 description" "10" "root"]
+                 ["TASK-1" "Task1 description" "20" "toor"]
+                 ["TASK-1" "Task1 description" "30" "user"]
+                 ["TASK-2" "Task2 description" "10" "root"]
+                 ["TASK-2" "Task2 description" "20" "toor"]
+                 ["TASK-2" "Task2 description" "30" "user"]
+                 ["TASK-3" "Task3 description" "10" "root"]
+                 ["TASK-3" "Task3 description" "20" "toor"]
+                 ["TASK-3" "Task3 description" "30" "user"]
+
+                 ["TASK-1" "Task1 description" "10" "root"]
+                 ["TASK-1" "Task1 description" "20" "toor"]
+                 ["TASK-1" "Task1 description" "30" "user"]
+                 ["TASK-2" "Task2 description" "10" "root"]
+                 ["TASK-2" "Task2 description" "20" "toor"]
+                 ["TASK-2" "Task2 description" "30" "user"]
+                 ["TASK-3" "Task3 description" "10" "root"]
+                 ["TASK-3" "Task3 description" "20" "toor"]
+                 ["TASK-3" "Task3 description" "30" "user"]]))
+
+  (testing "group-report-result"
+        (is (= (group-report-result csv-data) {:TASK-1 {:name "Task1 description"
+                                                        :participants {:root 30
+                                                                       :toor 60
+                                                                       :user 90}}
+
+                                               :TASK-2 {:name "Task2 description"
+                                                        :participants {:root 30
+                                                                       :toor 60
+                                                                       :user 90}}
+
+                                               :TASK-3 {:name "Task3 description"
+                                                        :participants {:root 30
+                                                                       :toor 60
+                                                                       :user 90}}})))
+  (testing "report-reducer"
+    (is (= (report-reducer {} ["TASK-2" "Task2 description" "30" "user"])
+           {:TASK-2 {:name "Task2 description", :participants {:user 30}}}))
+    (is (= (report-reducer
+             {:TASK-2 {:name "Task2 description", :participants {:user 30}}}
+             ["TASK-2" "Task2 description" "30" "user"])
+           {:TASK-2 {:name "Task2 description", :participants {:user 60}}}))
+    (is (= (report-reducer
+             {:TASK-2 {:name "Task2 description", :participants {:user 30}}}
+             ["TASK-1" "Task1 description" "30" "user"])
+           {:TASK-1 {:name "Task1 description", :participants {:user 30}}
+            :TASK-2 {:name "Task2 description", :participants {:user 30}}}))
+    (is (= (report-reducer
+             {:TASK-1 {:name "Task1 description", :participants {:user 30}}}
+             ["TASK-1" "Task1 description" "30" "user2"])
+           {:TASK-1 {:name "Task1 description", :participants {:user 30 :user2 30}}})))
+
+  (testing "transform-report"
+    (is (= (transform-report
+             [["Useless" "123" "120"  "0" "root" "Jhon Smith" "TASK-1" "Task1 description" "Jhon Smith (root)" "Dev"]
+              ["Useless" "123" "120"  "0" "root" "Jhon Smith" "TASK-1" "Task1 description" "Jhon Smith (root)" "Dev"]])
+           [["TASK-1" "Task1 description" "120" "root"]
+            ["TASK-1" "Task1 description" "120" "root"]]))))
+
+
