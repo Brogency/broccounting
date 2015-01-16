@@ -47,3 +47,34 @@
                      (if (~guard request#)
                        (let [~destruct request#] ~call)
                        (redirect "/login")))))))
+
+(defn transform-report [report]
+  (for [real-row report
+        :let [row [(get real-row 6)
+                   (get real-row 7)
+                   (get real-row 2)
+                   (get real-row 4)]]]
+    row))
+
+; {:OCSIAL-1
+;  {:name "Публикация новостей в соц сети"
+;   :participants {:ir4y 10}}}
+
+(defn parse-int [s]
+    (Integer/parseInt (re-find #"\A-?\d+" s)))
+
+(defn group-report-result [report]
+  (reduce (fn [result row]
+            (let [row (first report)
+                  task-id (keyword (first row))
+                  task-name (get row 1)
+                  spent-time (parse-int (get row 2))
+                  username (keyword (last row))]
+              (if (contains? result task-id)
+                (if (contains? (:participants (task-id result)) username)
+                   (update-in result [task-id :participants username] #(+ spent-time %))
+                   (assoc-in result [task-id :participants] {username spent-time}))
+                (assoc result task-id {:name task-name
+                                       :participants {username spent-time}}))))
+          {}
+          report))

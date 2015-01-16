@@ -2,7 +2,9 @@
   (:require [compojure.core :refer :all]
             [clj-time.core :as t]
             [broccounting.views.layout :as layout]
-            [broccounting.utils :refer [youtrack-get def-private-routes]]))
+            [broccounting.utils :refer [youtrack-get def-private-routes
+                                        transform-report group-report-result]]))
+
   
 (defn projects [session]
   (let [response (youtrack-get "admin/project" session)
@@ -21,16 +23,19 @@
         day (t/day now)
         start-period (t/local-date year month 1)
         stop-period (t/local-date year month day)
-        report (youtrack-get "current/reports/87-50/export" session)]
+        response (youtrack-get "current/reports/87-50/export" session)
+        report (transform-report (rest (:body response)))
+        group-report (group-report-result report)]
     (layout/common [:h2 "Project "
                         [:strong project_id]]
                    [:p "Report period"]
                    [:p "From " start-period " To " stop-period]
-                   [:table
-                    (for [row (:body report)]
-                      [:tr
-                       (for [item row]
-                         [:td item])])])))
+                   [:div (str group-report)])))
+                   ;[:table
+                    ;(for [row report]
+                      ;[:tr
+                       ;(for [item row]
+                         ;[:td item])])])))
 
 (defn guard [request]
   (let [[:as {session :session}] request
