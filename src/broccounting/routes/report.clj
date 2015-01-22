@@ -4,6 +4,7 @@
             [broccounting.views.layout :as layout]
             [broccounting.models.history :as history]
             [broccounting.models.report :as report]
+            [broccounting.models.rate :as rate]
             [broccounting.routes.utils :refer :all]
             [broccounting.youtrack :as youtrack]))
   
@@ -20,12 +21,14 @@
   (let [resp (youtrack/get (str "current/reports/" report_id "/export") session)]
     (if (= 200 (:status resp))
       (let [report (report/minify (rest (:body resp)))
+            report-users (report/table->users report)
             report-data (report/table->hash report)
             full-report (report/hash->table report-data {})
             html-data (layout/common
                         [:h2 "Project " [:strong report_id]]
                         (layout/display-matrix full-report))
             session (history/update session report_id)
+            session (rate/add-users session report-users)
             resp (content-type (response html-data)  "text/html; charset=utf-8")
             resp (assoc resp :session session)]
         resp)

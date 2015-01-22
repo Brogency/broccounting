@@ -38,3 +38,10 @@
 
 (defn table->hash [report]
   (reduce report-reducer {} report))
+
+(defn user-reducer [result row]
+  (let [username (keyword (last row))]
+    (conj result username)))
+
+(defn table->users [report]
+  (reduce user-reducer #{} report))
