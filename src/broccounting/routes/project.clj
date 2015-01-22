@@ -16,21 +16,33 @@
                            {:href (str "/project/" project-id)}
                            project-id]])])))
 
-(defn project [project_id session]
+(defn report [report_id session]
   (let [now (t/now)
         year (t/year now)
         month (t/month now)
         day (t/day now)
         start-period (t/local-date year month 1)
         stop-period (t/local-date year month day)
-        response (youtrack-get "current/reports/87-50/export" session)
+        response (youtrack-get (str "current/reports/" report_id "/export") session)
         report (transform-report (rest (:body response)))
         group-report (group-report-result report)]
     (layout/common [:h2 "Project "
-                        [:strong project_id]]
+                        [:strong report_id]]
                    [:p "Report period"]
                    [:p "From " start-period " To " stop-period]
-                   [:div (str group-report)])))
+                   [:table
+                    (for [[task {task-name :name
+                                 participants :participants}] group-report]
+                       (for [[user spent-time] participants
+                             :let [user-rait 0
+                                   work-cost (* spent-time user-rait)]]
+                         [:tr
+                          [:td task] [:td task-name]
+                          [:td user] [:td spent-time]
+                          [:td work-cost]]))])))
+
+
+
 
 (defn guard [request]
   (let [[:as {session :session}] request
@@ -41,4 +53,7 @@
 
 (def-private-routes project-routes guard
   (GET "/projects" [:as {session :session}] (projects session))
-  (GET "/project/:id" [:as {{id :id} :params session :session}] (project id session)))
+  ;(GET "/project/:id" [:as {{id :id} :params session :session}] (project id session))
+  ;(GET "/reports"
+  (GET "/report/:id" [:as {{id :id} :params session :session}] (report id session)))
+
