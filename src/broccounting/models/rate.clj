@@ -1,13 +1,18 @@
-(ns broccounting.models.rate)
+(ns broccounting.models.rate
+  (:require [broccounting.models.utils :refer [parse-int]]))
 
-(defn get-rate [session] 
+(defn rate-db [session]
   (:rate-db session {}))
 
-(defn set-rate [session user & [rate]]
-  (assoc-in session [:rate-db user] (or rate 0)))
+(defn set-rate [session [user rate]]
+  (assoc-in session [:rate-db user] rate))
+
+(def set-rates (partial reduce set-rate))
 
 (defn add-user [session user]
   (update-in session [:rate-db user] #(or % 0)))
 
-(defn add-users [session user-list]
-  (reduce add-user session user-list))
+(def add-users (partial reduce add-user))
+
+(defn form-data->rate-db [form-data]
+  (zipmap (map keyword (keys form-data)) (map parse-int (vals form-data))))

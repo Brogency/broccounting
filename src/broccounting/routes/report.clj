@@ -23,7 +23,7 @@
       (let [report (report/minify (rest (:body resp)))
             report-users (report/table->users report)
             report-data (report/table->hash report)
-            full-report (report/hash->table report-data {})
+            full-report (report/hash->table report-data (rate/rate-db session))
             html-data (layout/common
                         [:h2 "Project " [:strong report_id]]
                         (layout/display-matrix full-report))

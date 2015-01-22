@@ -1,7 +1,5 @@
-(ns broccounting.models.report)
-
-(defn- parse-int [s]
-    (Integer/parseInt (re-find #"\A-?\d+" s)))
+(ns broccounting.models.report
+  (:require [broccounting.models.utils :refer [parse-int]]))
 
 (defn minify [report]
   (for [real-row report
@@ -16,7 +14,8 @@
               participants :participants}] group-report]
     (for [[user spent-time] participants
           :let [user-rate (user rate-db 0)
-                work-cost (* spent-time user-rate)]]
+                spent-time (float (/ spent-time 60))
+                work-cost (float (* spent-time user-rate))]]
       [task task-name user spent-time work-cost]))))
 
 ; Structure of group report

@@ -30,3 +30,8 @@
            {:href (str "/project/" project-id)}
            project-id]])])
 
+(defn rates-form [rates-db]
+  [:form {:method "POST"}
+   (for [[name rate] rates-db]
+     [:p [:label name] [:input {:name name :value rate}]])
+   [:p [:input {:type "Submit" :value "Update rate"}]]])
