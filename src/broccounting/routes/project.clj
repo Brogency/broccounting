@@ -1,14 +1,14 @@
 (ns broccounting.routes.project
   (:require [compojure.core :refer :all]
+            [ring.util.response :refer [redirect response content-type]]
             [clj-time.core :as t]
             [broccounting.views.layout :as layout]
-            [broccounting.utils :refer [youtrack-get def-private-routes
-                                        transform-report group-report-result]]))
+            [broccounting.utils :refer :all]))
 
   
 (defn projects [session]
-  (let [response (youtrack-get "admin/project" session)
-        body (:body response)]
+  (let [resp (youtrack-get "admin/project" session)
+        body (:body resp)]
     (layout/common [:h2 "Projects:"]
                    [:div
                     (for [project-id (map (comp :id :attrs) (:content body))]
@@ -16,44 +16,49 @@
                            {:href (str "/project/" project-id)}
                            project-id]])])))
 
+(defn project [project_id session]
+  (layout/common [:h2 (str "Project: " project_id)]
+                 [:div "Content come soon"]
+                 [:a {:href "/projects"} "<- back"]))
+
+
+(defn reports [session]
+  (let [history (:history session [])]
+    (layout/common [:h2 "Reports"]
+                   [:h3 "Last reports"]
+                   [:ul
+                    (for [item history]
+                      [:li [:a {:href (str "/report/" item)} item]])]
+                   [:form {:method "POST"}
+                    [:input {:name "report_id" :type "text"}]
+                    [:input {:type "submit" :value "new report"}]])))
+
 (defn report [report_id session]
-  (let [now (t/now)
-        year (t/year now)
-        month (t/month now)
-        day (t/day now)
-        start-period (t/local-date year month 1)
-        stop-period (t/local-date year month day)
-        response (youtrack-get (str "current/reports/" report_id "/export") session)
-        report (transform-report (rest (:body response)))
-        group-report (group-report-result report)]
-    (layout/common [:h2 "Project "
-                        [:strong report_id]]
-                   [:p "Report period"]
-                   [:p "From " start-period " To " stop-period]
-                   [:table
-                    (for [[task {task-name :name
-                                 participants :participants}] group-report]
-                       (for [[user spent-time] participants
-                             :let [user-rait 0
-                                   work-cost (* spent-time user-rait)]]
-                         [:tr
-                          [:td task] [:td task-name]
-                          [:td user] [:td spent-time]
-                          [:td work-cost]]))])))
-
-
-
+  (let [resp (youtrack-get (str "current/reports/" report_id "/export") session)]
+    (if (= 200 (:status resp))
+      (let [report (transform-report (rest (:body resp)))
+            group-report (group-report-result report)
+            html-data (layout/common
+                        [:h2 "Project "
+                         [:strong report_id]]
+                        (layout/display-matrix
+                          (transform-group-report group-report {})))
+            session (update-in session [:history] (partial push-to-history report_id 10))
+            resp (content-type (response html-data)  "text/html; charset=utf-8")
+            resp (assoc resp :session session)]
+        resp)
+      (redirect "/reports"))))
 
 (defn guard [request]
-  (let [[:as {session :session}] request
-        response (youtrack-get 
-                   "admin/user/root" 
-                   session)]
-    (= (:status response) 200)))
+  (let-request [[:as {session :session}] request]
+    (let [res (youtrack-get
+                "admin/user/root"
+                session)]
+    (= (:status res) 200))))
 
 (def-private-routes project-routes guard
   (GET "/projects" [:as {session :session}] (projects session))
-  ;(GET "/project/:id" [:as {{id :id} :params session :session}] (project id session))
-  ;(GET "/reports"
-  (GET "/report/:id" [:as {{id :id} :params session :session}] (report id session)))
-
+  (GET "/project/:id" [:as {{id :id} :params session :session}] (project id session))
+  (GET "/reports" [:as {session :session}] (reports session))
+  (POST "/reports" [report_id] (redirect (str "report/" report_id)))
+  (GET "/report/:id" [id :as {session :session}] (report id session)))

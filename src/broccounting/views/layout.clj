@@ -10,3 +10,10 @@
 
 (defn error [& body]
   (common [:div {:class "error"} body]))
+
+(defn display-matrix [matrix]
+  [:table
+    (for [row matrix]
+      [:tr
+       (for [item row]
+         [:td (str item)])])])

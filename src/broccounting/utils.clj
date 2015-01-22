@@ -1,5 +1,5 @@
 (ns broccounting.utils
-  (:require [compojure.core :refer [defroutes routes]]
+  (:require [compojure.core :refer [defroutes routes let-request]]
             [clojure.xml :as xml]
             [clojure.data.csv :as csv]
             [ring.util.response :refer [redirect]]
@@ -45,7 +45,7 @@
          `(~method ~path [request#] 
                    (fn [request#] 
                      (if (~guard request#)
-                       (let [~destruct request#] ~call)
+                       (let-request [~destruct request#] ~call)
                        (redirect "/login")))))))
 
 (defn transform-report [report]
@@ -55,6 +55,14 @@
                    (get real-row 2)
                    (get real-row 4)]]]
     row))
+
+(defn transform-group-report [group-report rate-db]
+ (apply concat (for [[task {task-name :name
+              participants :participants}] group-report]
+    (for [[user spent-time] participants
+          :let [user-rate (user rate-db 0)
+                work-cost (* spent-time user-rate)]]
+      [task task-name user spent-time work-cost]))))
 
 (defn parse-int [s]
     (Integer/parseInt (re-find #"\A-?\d+" s)))
@@ -78,3 +86,9 @@
 
 (defn group-report-result [report]
   (reduce report-reducer {} report))
+
+(defn push-to-history [item len col]
+  (vec
+    (if (some #(= item %) col)
+      col
+      (take len (conj col item)))))
