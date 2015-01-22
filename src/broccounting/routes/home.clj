@@ -2,7 +2,7 @@
   (:require [compojure.core :refer :all]
             [ring.util.response :refer [redirect]]
             [broccounting.views.layout :as layout]
-            [broccounting.utils :refer [youtrack-post]]))
+            [broccounting.youtrack :as youtrack]))
   
 (defn home [request]
   (layout/common 
@@ -21,7 +21,7 @@
              [:input {:type "submit"}]]]))
 
 (defn login-do-login [login password session]
-  (let [response (youtrack-post 
+  (let [response (youtrack/post 
                    "user/login" 
                    {}
                    {:form-params {:login login
@@ -32,7 +32,7 @@
       (if (= status 200)
         (let [{{jsessionid :value} "JSESSIONID"} (:cookies response)
               session (assoc session :jsessionid jsessionid)]
-          (-> (redirect "/projects")
+          (-> (redirect "/reports")
               (assoc :session session)))
         (layout/error (str content)))))
 

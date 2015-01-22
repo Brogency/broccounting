@@ -17,3 +17,16 @@
       [:tr
        (for [item row]
          [:td (str item)])])])
+
+(defn history-list [history]
+ [:ul
+  (for [item history]
+    [:li [:a {:href (str "/report/" item)} item]])])
+
+(defn projects [projects]
+  [:div
+    (for [project-id projects]
+      [:p [:a
+           {:href (str "/project/" project-id)}
+           project-id]])])
+
