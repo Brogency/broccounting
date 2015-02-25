@@ -38,6 +38,10 @@
                            [:h2 "Project " [:strong report_id]]
                            (layout/display-matrix full-report)
                            [:form {:method :POST}
+                            [:p [:label "Contractor:"] [:input {:name "contractor"}]]
+                            [:p [:label "Bill name:"] [:input {:name "bill_name"}]]
+                            [:p [:label "Elba login:"] [:input {:name "elba_login"}]]
+                            [:p [:label "Elba password:"] [:input {:name "elba_password" :type :password}]]
                             [:input {:type :submit}]])
                 session (history/update session report_id)
                 session (rate/add-users session report-users)
@@ -46,10 +50,11 @@
             resp))))
 
 
-(defn create-bill [report_id session]
+(defn create-bill [report_id session form-data]
   (let [[_ full-report] (get-full-report report_id session)
-        [login password] (credentials session)
-        bill (elba/build-bill "test/1" "test contractor" full-report)
+        login (:elba_login form-data)
+        password (:elba_password form-data)
+        bill (elba/build-bill (:bill_name form-data) (:contractor form-data) full-report)
         result (elba/create-bill login password bill)]
     (layout/common result)))
 
@@ -57,4 +62,4 @@
   (GET  "/reports"    [:as {session :session}]    (reports session))
   (POST "/reports"    [report_id]                 (redirect (str "report/" report_id)))
   (GET  "/report/:id" [id :as {session :session}] (report id session))
-  (POST "/report/:id" [id :as {session :session}] (create-bill id session)))
+  (POST "/report/:id" [id :as {session :session params :params}] (create-bill id session (dissoc params :id))))
