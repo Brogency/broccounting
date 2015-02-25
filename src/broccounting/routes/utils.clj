@@ -5,10 +5,10 @@
 
 (defn default-guard [request]
   (let-request [[:as {session :session}] request]
-    (let [res (youtrack/get
-                "admin/user/root"
-                session)]
-    (= (:status res) 200))))
+               (let [res (youtrack/get
+                          "admin/user/root"
+                          session)]
+                 (= (:status res) 200))))
 
 (defmacro def-private-routes [name guard & routes]
   `(defroutes ~name 

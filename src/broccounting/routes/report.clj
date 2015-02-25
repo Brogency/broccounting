@@ -7,7 +7,7 @@
             [broccounting.models.rate :as rate]
             [broccounting.routes.utils :refer :all]
             [broccounting.youtrack :as youtrack]))
-  
+
 
 (defn reports [session]
   (layout/common [:h2 "Reports"]
@@ -25,8 +25,8 @@
             report-data (report/table->hash report)
             full-report (report/hash->table report-data (rate/rate-db session))
             html-data (layout/common
-                        [:h2 "Project " [:strong report_id]]
-                        (layout/display-matrix full-report))
+                       [:h2 "Project " [:strong report_id]]
+                       (layout/display-matrix full-report))
             session (history/update session report_id)
             session (rate/add-users session report-users)
             resp (content-type (response html-data)  "text/html; charset=utf-8")

@@ -5,7 +5,7 @@
             [broccounting.models.rate :as rate]
             [broccounting.routes.utils :refer :all]))
 
-  
+
 (defn rates [session]
   (let [rate-db (rate/rate-db session)]
     (layout/common [:h2 "Rates:"]
@@ -23,4 +23,4 @@
   (GET  "/rates" [:as {session   :session}] (rates session))
   (POST "/rates" [:as {session   :session
                        form-data :form-params}]
-        (update-rates form-data session)))
+    (update-rates form-data session)))

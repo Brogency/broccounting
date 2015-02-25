@@ -25,6 +25,6 @@
 (def app
   (-> (routes home-routes project-routes rate-routes report-routes app-routes)
       (wrap-session 
-          {:store (cookie-store {:key "1234567890123456"})})
+       {:store (cookie-store {:key "1234567890123456"})})
       (handler/site)
       (wrap-base-url)))

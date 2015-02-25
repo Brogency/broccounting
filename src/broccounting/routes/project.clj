@@ -5,7 +5,7 @@
             [broccounting.routes.utils :refer :all]
             [broccounting.youtrack :as youtrack]))
 
-  
+
 (defn projects [session]
   (let [resp (youtrack/get "admin/project" session)
         body (:body resp)

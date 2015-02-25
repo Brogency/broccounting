@@ -10,13 +10,13 @@
     row))
 
 (defn hash->table [group-report rate-db]
- (apply concat (for [[task {task-name :name
-              participants :participants}] group-report]
-    (for [[user spent-time] participants
-          :let [user-rate (user rate-db 0)
-                spent-time (float (/ spent-time 60))
-                work-cost (float (* spent-time user-rate))]]
-      [task task-name user spent-time work-cost]))))
+  (apply concat (for [[task {task-name :name
+                             participants :participants}] group-report]
+                  (for [[user spent-time] participants
+                        :let [user-rate (user rate-db 0)
+                              spent-time (float (/ spent-time 60))
+                              work-cost (float (* spent-time user-rate))]]
+                    [task task-name user spent-time work-cost]))))
 
 ; Structure of group report
 ; {:OCSIAL-1
@@ -29,9 +29,9 @@
         username (keyword (last row))]
     (if (contains? result task-id)
       (if (contains? (:participants (task-id result)) username)
-         (update-in result [task-id :participants username] #(+ spent-time %))
-         (let [participants (:participants (task-id result))]
-           (assoc-in result [task-id :participants] (merge participants {username spent-time}))))
+        (update-in result [task-id :participants username] #(+ spent-time %))
+        (let [participants (:participants (task-id result))]
+          (assoc-in result [task-id :participants] (merge participants {username spent-time}))))
       (assoc result task-id {:name task-name
                              :participants {username spent-time}}))))
 

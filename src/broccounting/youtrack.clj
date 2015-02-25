@@ -16,11 +16,11 @@
                   {"JSESSIONID" {:value jsessionid}}
                   {})
         response (method 
-                   (str "http://bro.myjetbrains.com/youtrack/rest/" path)
-                   (merge 
-                     {:cookies cookies 
-                      :throw-exceptions false}
-                     opts))
+                  (str "http://bro.myjetbrains.com/youtrack/rest/" path)
+                  (merge 
+                   {:cookies cookies 
+                    :throw-exceptions false}
+                   opts))
         responce-body (:body response)
         content-type-header ((:headers response) "Content-Type")
         content-type (get (clojure.string/split content-type-header #";") 0)
@@ -30,10 +30,10 @@
                 content-type
                 identity)
         body (parser responce-body)]
-  (assoc response :body body))) 
+    (assoc response :body body))) 
 
 (defn post [path session & [opts]]
   (query client/post path session opts))
- 
+
 (defn get [path session & [opts]]
   (query client/get path session opts))

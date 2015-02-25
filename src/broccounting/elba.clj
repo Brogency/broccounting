@@ -7,20 +7,19 @@
 
 (defn create-bill [login password bill]
   (client/post 
-    "https://elba.kontur.ru/API/CreateBill.ashx"
-    {:body (generate-string bill)
-     :throw-exceptions false
-     :headers {"X-Login"    (url-encode login)
-               "X-Password" (url-encode password)}}))
+   "https://elba.kontur.ru/API/CreateBill.ashx"
+   {:body (generate-string bill)
+    :throw-exceptions false
+    :headers {"X-Login"    (url-encode login)
+              "X-Password" (url-encode password)}}))
 
 (def build-bill [name contractor items]
-  {
-  :Number name
-  :Date (f/unparse (f/formatters :date-time) (t/now)) ;;"2014-02-07T00:00:00.000Z",
-  :WithNds false
-  :SumsWithNds false
-  :Contractor {:Name contractor}
-  :Items items})
+  {:Number name
+   :Date (f/unparse (f/formatters :date-time) (t/now)) ;;"2014-02-07T00:00:00.000Z",
+   :WithNds false
+   :SumsWithNds false
+   :Contractor {:Name contractor}
+   :Items items})
 
 (def build-item [name quantity price]
   {:ProductName name

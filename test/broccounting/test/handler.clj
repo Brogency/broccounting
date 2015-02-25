@@ -21,9 +21,9 @@
   (testing "login sucess"
     (with-redefs-fn {#'broccounting.utils/youtrack-post 
                      (fn [& _]
-                      {:status 200
-                       :body {:content ""}
-                       :cookies {"JSESSIONID" {:value "secret-session-cookie"}}})}
+                       {:status 200
+                        :body {:content ""}
+                        :cookies {"JSESSIONID" {:value "secret-session-cookie"}}})}
       #(let [response (app (request :post "/login" {:login "login"
                                                     :password "password"}))
              headers (:headers response)
@@ -35,8 +35,8 @@
   (testing "login fail"
     (with-redefs-fn {#'broccounting.utils/youtrack-post 
                      (fn [& _]
-                      {:status 401
-                       :body {:content ["Some-error-text"]}})}
+                       {:status 401
+                        :body {:content ["Some-error-text"]}})}
       #(let [response (app (request :post "/login" {:login "login"
                                                     :password "password"}))
              body (:body response)]
@@ -46,14 +46,14 @@
   (testing "projects route unauthorized"
     (let [response (app (request :get "/projects"))
           headers (:headers response)]
-        (is (= (:status response) 302))
-        (is (= (get headers "Location") "/login"))))
+      (is (= (:status response) 302))
+      (is (= (get headers "Location") "/login"))))
 
   (testing "projects route authorized"
     (with-redefs-fn {#'broccounting.utils/youtrack-get
                      (fn [path session & [opts]]
-                         {:status 200 
-                          :body {:content []}})}
+                       {:status 200 
+                        :body {:content []}})}
       #(let [response (app (request :get "/projects"))
              body (:body response)]
          (is (= (:status response) 200))
@@ -62,10 +62,9 @@
   (testing "projects page content"
     (with-redefs-fn {#'broccounting.utils/youtrack-get
                      (fn [path session & [opts]]
-                         {:status 200 
-                          :body {:content [{:attrs {:id "PROJECT1"}}
-                                           {:attrs {:id "PROJECT2"}}
-                                           ]}})}
+                       {:status 200 
+                        :body {:content [{:attrs {:id "PROJECT1"}}
+                                         {:attrs {:id "PROJECT2"}}]}})}
       #(let [response (app (request :get "/projects"))
              body (:body response)]
          (is (= (:status response) 200))
