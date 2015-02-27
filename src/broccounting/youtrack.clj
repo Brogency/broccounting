@@ -5,6 +5,12 @@
             [ring.util.response :refer [redirect]]
             [clj-http.client :as client]))
 
+(declare ^:dynamic *youtrack-entrypoint*)
+
+(defmacro with-youtrack [entripoint & code]
+  `(binding [*youtrack-entrypoint* ~entripoint]
+     ~@code))
+
 (defn- parse-xml [xml-data]
   (let [stream (java.io.ByteArrayInputStream. (.getBytes (.trim xml-data)))
         body (xml/parse stream)]
@@ -16,7 +22,7 @@
                   {"JSESSIONID" {:value jsessionid}}
                   {})
         response (method 
-                  (str "http://bro.myjetbrains.com/youtrack/rest/" path)
+                  (str *youtrack-entrypoint* path)
                   (merge 
                    {:cookies cookies 
                     :throw-exceptions false}

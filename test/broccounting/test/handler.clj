@@ -19,7 +19,7 @@
       (is (re-find #"<input type=\"submit\">" body))))
 
   (testing "login sucess"
-    (with-redefs-fn {#'broccounting.utils/youtrack-post 
+    (with-redefs-fn {#'broccounting.youtrack/youtrack-post 
                      (fn [& _]
                        {:status 200
                         :body {:content ""}
@@ -33,7 +33,7 @@
          (is (= (get headers "Location") "/projects")))))
 
   (testing "login fail"
-    (with-redefs-fn {#'broccounting.utils/youtrack-post 
+    (with-redefs-fn {#'broccounting.youtrack/youtrack-post 
                      (fn [& _]
                        {:status 401
                         :body {:content ["Some-error-text"]}})}
@@ -50,7 +50,7 @@
       (is (= (get headers "Location") "/login"))))
 
   (testing "projects route authorized"
-    (with-redefs-fn {#'broccounting.utils/youtrack-get
+    (with-redefs-fn {#'broccounting.youtrack/youtrack-get
                      (fn [path session & [opts]]
                        {:status 200 
                         :body {:content []}})}
@@ -60,7 +60,7 @@
          (is (re-find #"Projects:" body)))))
 
   (testing "projects page content"
-    (with-redefs-fn {#'broccounting.utils/youtrack-get
+    (with-redefs-fn {#'broccounting.youtrack/youtrack-get
                      (fn [path session & [opts]]
                        {:status 200 
                         :body {:content [{:attrs {:id "PROJECT1"}}

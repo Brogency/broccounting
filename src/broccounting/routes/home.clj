@@ -16,28 +16,35 @@
    [:div
     [:h3 "Result"]
     [:form {:method "POST"}
-     [:input {:name "login"}]
-     [:input {:name "password" :type "password"}]
+     [:label "Youtrack entry point" [:input {:name "youtrack" :value (:youtrack session "")}]]
+     [:br]
+     [:br]
+     [:label "login" [:input {:name "login"}]]
+     [:br]
+     [:label "Password" [:input {:name "password" :type "password"}]]
+     [:br]
      [:input {:type "submit"}]]]))
 
-(defn login-do-login [login password session]
-  (let [response (youtrack/post 
-                  "user/login" 
-                  {}
-                  {:form-params {:login login
-                                 :password password}})
-        status (:status response)
-        body (:body response)
-        [content] (:content body)]
-    (if (= status 200)
-      (let [{{jsessionid :value} "JSESSIONID"} (:cookies response)
-            session (assoc session :jsessionid jsessionid)]
-        (-> (redirect "/reports")
-            (assoc :session session)))
-      (layout/error (str content)))))
+(defn login-do-login [login password youtrack session]
+  (youtrack/with-youtrack youtrack
+    (let [response (youtrack/post 
+                    "user/login" 
+                    {}
+                    {:form-params {:login login
+                                   :password password}})
+          status (:status response)
+          body (:body response)
+          [content] (:content body)]
+      (if (= status 200)
+        (let [{{jsessionid :value} "JSESSIONID"} (:cookies response)
+              session (assoc session :jsessionid jsessionid)
+              session (assoc session :youtrack youtrack)]
+          (-> (redirect "/reports")
+              (assoc :session session)))
+        (layout/error (str content))))))
 
 (defroutes home-routes
   (GET "/" request (home request))
   (GET "/login" [:as {session :session}] (login session))
-  (POST "/login" [login password :as {session :session}]
-    (login-do-login login password session)))
+  (POST "/login" [login password youtrack :as {session :session}]
+    (login-do-login login password youtrack session)))
