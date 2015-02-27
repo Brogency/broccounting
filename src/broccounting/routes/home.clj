@@ -36,9 +36,7 @@
           body (:body response)
           [content] (:content body)]
       (if (= status 200)
-        (let [{{jsessionid :value} "JSESSIONID"} (:cookies response)
-              session (assoc session :jsessionid jsessionid)
-              session (assoc session :youtrack youtrack)]
+        (let [session (assoc session :youtrack youtrack)]
           (-> (redirect "/reports")
               (assoc :session session)))
         (layout/error (str content))))))

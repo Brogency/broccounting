@@ -6,9 +6,14 @@
             [clj-http.client :as client]))
 
 (declare ^:dynamic *youtrack-entrypoint*)
+(declare ^:dynamic *request-cookie-store*)
 
 (defmacro with-youtrack [entripoint & code]
   `(binding [*youtrack-entrypoint* ~entripoint]
+     ~@code))
+
+(defmacro with-cookie-store [cs & code]
+  `(binding [*request-cookie-store* ~cs]
      ~@code))
 
 (defn- parse-xml [xml-data]
@@ -17,14 +22,10 @@
     body))
 
 (defn- query [method path session & [opts]]
-  (let [jsessionid (:jsessionid session)
-        cookies (if jsessionid 
-                  {"JSESSIONID" {:value jsessionid}}
-                  {})
-        response (method 
+  (let [response (method 
                   (str *youtrack-entrypoint* path)
                   (merge 
-                   {:cookies cookies 
+                   {:cookie-store *request-cookie-store* 
                     :throw-exceptions false}
                    opts))
         responce-body (:body response)
