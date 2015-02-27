@@ -35,3 +35,11 @@
    (for [[name rate] rates-db]
      [:p [:label name] [:input {:name name :value rate}]])
    [:p [:input {:type "Submit" :value "Update rate"}]]])
+
+
+(defn display-rate-db [rate-db]
+  [:ul
+   (for [[name rate] rate-db]
+     [:li (str name " ") [:strong rate]])
+   [:li [:a {:href "/rates"} "Chage rates"]]])
+   

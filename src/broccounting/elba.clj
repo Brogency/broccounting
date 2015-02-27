@@ -13,13 +13,13 @@
     :headers {"X-Login"    (url-encode login)
               "X-Password" (url-encode password)}}))
 
-(defn build-item [[id text _user quantity price]]
+(defn build-item [[id text _user quantity price total]]
   {:ProductName (str id " " text)
    :UnitName "час"
    :Quantity quantity
-   :Price (/ price quantity)
+   :Price price
    :PriceWithoutNds price
-   :Sum price})
+   :Sum total})
 
 (defn build-bill [name contractor items]
   {:Number name
