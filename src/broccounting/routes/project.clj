@@ -1,8 +1,7 @@
 (ns broccounting.routes.project
-  (:require [compojure.core :refer [GET]]
+  (:require [compojure.core :refer [GET defroutes]]
             [broccounting.views.layout :as layout]
             [broccounting.models.project :as project]
-            [broccounting.routes.utils :refer :all]
             [broccounting.youtrack :as youtrack]))
 
 
@@ -19,6 +18,6 @@
                  [:a {:href "/projects"} "<- back"]))
 
 
-(def-private-routes project-routes default-guard
+(defroutes project-routes
   (GET "/projects" [:as {session :session}] (projects session))
   (GET "/project/:id" [:as {{id :id} :params session :session}] (project id session)))

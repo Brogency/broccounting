@@ -1,9 +1,8 @@
 (ns broccounting.routes.rate
-  (:require [compojure.core :refer [GET POST]]
+  (:require [compojure.core :refer [GET POST defroutes]]
             [ring.util.response :refer [response content-type]]
             [broccounting.views.layout :as layout]
-            [broccounting.models.rate :as rate]
-            [broccounting.routes.utils :refer :all]))
+            [broccounting.models.rate :as rate]))
 
 
 (defn rates [session]
@@ -19,7 +18,7 @@
         resp (assoc resp :session session)]
     resp))
 
-(def-private-routes rate-routes default-guard
+(defroutes rate-routes
   (GET  "/rates" [:as {session   :session}] (rates session))
   (POST "/rates" [:as {session   :session
                        form-data :form-params}]

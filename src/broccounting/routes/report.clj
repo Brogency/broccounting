@@ -1,12 +1,11 @@
 (ns broccounting.routes.report
-  (:require [compojure.core :refer [GET POST]]
+  (:require [compojure.core :refer [GET POST defroutes]]
             [ring.util.response :refer [redirect response content-type]]
             [broccounting.views.layout :as layout]
             [broccounting.models.history :as history]
             [broccounting.models.report :as report]
             [broccounting.models.rate :as rate]
             [broccounting.models.elba :refer [credentials]]
-            [broccounting.routes.utils :refer :all]
             [broccounting.youtrack :as youtrack]
             [broccounting.elba :as elba]))
 
@@ -58,7 +57,7 @@
         result (elba/create-bill login password bill)]
     (layout/common result)))
 
-(def-private-routes report-routes default-guard
+(defroutes report-routes
   (GET  "/reports"    [:as {session :session}]    (reports session))
   (POST "/reports"    [report_id]                 (redirect (str "report/" report_id)))
   (GET  "/report/:id" [id :as {session :session}] (report id session))
