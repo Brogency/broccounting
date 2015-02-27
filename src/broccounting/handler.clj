@@ -36,15 +36,16 @@
         (swap! cookie-stories #(assoc % cs-id (clj-http.cookies/cookie-store))))
       (with-cookie-store (get @cookie-stories cs-id)
         (let [responce (if (nil? youtrack)
-                         (if (= (:uri request) "/login")
+                         (if (or (= (:uri request) "/login")
+                                 (= (:uri request) "/css/screen.css"))
                            (handler request)
                            (redirect "/login"))
                          (with-youtrack youtrack
                            (handler request)))
-              session (:session responce)
+              session (:session responce (:session request))
               session (assoc session :cs-id cs-id)
               responce (assoc responce :session session)]
-              responce)))))
+          responce)))))
 
 (def app
   (-> (routes home-routes project-routes rate-routes report-routes app-routes)
