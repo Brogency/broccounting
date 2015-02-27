@@ -1,10 +1,8 @@
-(ns broccounting.test.utils
-  (:use clojure.test
-        ring.mock.request
-        broccounting.utils)
-  (:require
-   [compojure.core :refer [GET routes]]))
+(ns broccounting.test.utils)
 
+
+
+(comment
 
 (deftest youtrack-api
   (with-redefs-fn {#'clj-http.client/get (fn [path opts]
@@ -156,4 +154,4 @@
            [["TASK-1" "Task1 description" "120" "root"]
             ["TASK-1" "Task1 description" "120" "root"]]))))
 
-
+)
